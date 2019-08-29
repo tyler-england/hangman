@@ -1,7 +1,7 @@
 # fullfilepath = r"/Users/Tyler/Desktop/words_test.txt"
 fullfilepath = r"C:\Users\EnglandT\Desktop\scratch\words.txt"
 import random as rand
-import sys
+import collections
 
 with open(fullfilepath) as textfile:  # list of all possible words
     wordslist = [line.rstrip() for line in textfile]
@@ -31,7 +31,7 @@ drawing[6] = (""" O
  | 
 / \\""")
 
-if any(x == resp.strip().upper() for x in affirmations):
+if any(x == resp.strip().upper() for x in affirmations): #word generated to guess
     i = rand.randrange(len(wordslist))
     word = wordslist[i]
     numlets = len(word)
@@ -39,7 +39,6 @@ if any(x == resp.strip().upper() for x in affirmations):
 
     wordvis=[0]*((numlets*2)-1) #what the user sees (dashes for each letter)
     wordvis[0]="_"
-    wordvis[1]="a"
     for i in range(1,len(wordvis)):
         if i%2==0:
             wordvis[i]="_"
@@ -51,13 +50,13 @@ if any(x == resp.strip().upper() for x in affirmations):
         singleword=False
         print()
         if letsguessed > "":
-            print("Not included: " + letsguessed)
+            print("Not included: " + letsguessed) #letters that have been guessed incorrectly
         strwordvis=""
         for i in wordvis:
             strwordvis +=str(i)
-        print(strwordvis)
+        print(strwordvis) #dashes & letters so far
         if nummistakes>0:
-            print(drawing[nummistakes])
+            print(drawing[nummistakes]) #hangman drawing
         guess=input("Guess a letter: ")
 
         if not guess.isalpha():
@@ -92,6 +91,7 @@ if any(x == resp.strip().upper() for x in affirmations):
 else:  # help user guess a word
 
     numlets = 0
+    vowels = ["A", "E", "I", "O", "U"]
 
     while numlets == 0:  # get number of letters in the word
         try:
@@ -119,7 +119,43 @@ else:  # help user guess a word
     letsguessed = []
     spelling = ["-"]*numlets  # array with 'numlets' elements
     while nummistakes < 6 and singleword == False:  # 6 mistakes means you lost
-        guess = input("Letter to guess? ")
+        print(wordslist)
+        sugglet=""
+        corrint=0 #correcting integer, if most freq letter has been guessed
+        while sugglet=="":
+            strtemp = "" #figure out most tactful letter to guess
+            for i in wordslist: #for each word
+                cnt=collections.Counter(i) #count letters
+                for j in cnt:
+                    strtemp=strtemp+j #string where each word's letters are listed w/o freq
+
+            cnt = collections.Counter(strtemp)
+            maxsofar = 0
+            for key, value in cnt.items():
+                if value > maxsofar:
+                    maxsofar = value #get highest frequency (letter in most words)
+            maxsofar=maxsofar-corrint
+
+            strtemp = ""
+            for key, value in cnt.items():
+                if value == maxsofar and not(any(letguessed==key.upper() for letguessed in letsguessed)):
+                    strtemp += key #string of most frequent new letter(s)
+
+            if len(strtemp)==0:
+                corrint=corrint+1
+            elif len(strtemp)==1:
+                sugglet=strtemp[0]
+            else:
+                sugglet="xxx"
+                for key in strtemp:
+                    if any(vowel == key.upper() for vowel in vowels):
+                        sugglet = key
+
+                if sugglet=="xxx":
+                    sugglet = strtemp[0]
+
+        print("Suggested letter to guess: " + sugglet)
+        guess = input("Enter your letter to guess: ")
 
         if len(guess)>1:
             print("Please enter only one letter.")
@@ -129,9 +165,23 @@ else:  # help user guess a word
             if any(x == guess for x in letsguessed):
                 print("That letter has already been guessed.")
             else:
-                letsguessed.append(guess)
-                inword = input("Is " + guess + " in the word? (y/n) ")
+                letsguessed.append(guess.upper())
+                inword = input("Is " + guess.upper() + " in the word? (y/n) ")
                 if inword.strip().upper() in affirmations:  # letter is in the word at least once
+                    check1=False
+                    check2=False
+                    finalword=""
+                    for word in wordslist:
+                        if guess.upper() in word.upper():
+                            if check1==True:
+                                check2=True
+                            else:
+                                finalword=word
+                                check1=True
+                    if check2==False and finalword!="": #only one word with that letter is left
+                        print("The word is: " + finalword)
+                        quit()
+
                     numinst = -1  # allow user to enter 0 if they mistakenly chose "y"
                     while numinst == -1:  # get number of times it appears
                         try:
@@ -143,11 +193,11 @@ else:  # help user guess a word
                         letpos = [0]*numinst
                         if numinst == 1:
                             letpos[0] = input("How many letters from the beginning of the word (starting with 1) is the " +
-                                              guess + "? ")
+                                              guess.upper() + "? ")
                         else:
-                            for x in range(numinst - 1):
+                            for x in range(numinst):
                                 letpos[x] = input("How many letters from the beginning of the word (starting with 1) is " +
-                                                  guess + " #" + str(x + 1) + "? ")
+                                                  guess.upper() + " #" + str(x + 1) + "? ")
 
                         for x in letpos:  # update spelling
                             spelling[int(x) - 1] = guess.upper()
