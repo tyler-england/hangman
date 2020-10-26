@@ -1,4 +1,5 @@
 #Hangman
+
 Hangman game, two modes of functionality
 
 1: Play hangman! Try to guess the word that the computer has chosen.
