@@ -3,7 +3,8 @@
 
 # txt file of words
 # fullfilepath = r"/Users/Tyler/Desktop/words.txt" #macbook
-fullfilepath = r"C:\Users\EnglandT\Desktop\scratch\words.txt" #pc
+# fullfilepath = r"C:\Users\Tyler\Desktop\words.txt" #pc
+fullfilepath = r"K:\EnglandT\Misc\Scripts\Python\Hman\words.txt"  # BW PC
 
 import random as rand
 import collections
@@ -177,11 +178,13 @@ else:  # help user guess a word
                 i += 1
 
         if len(letsguessed) > 0:  # print bank of letters that have been guessed
+            print(" ")
             print("Not included: " + letsguessed)
 
         strword = ""  # to represent wordvis as a string
         for i in wordvis:  # for each letter space
             strword += str(i)  # strword converts wordvis to a string
+        # print(" ")
         print(strword)
         print("Suggested letter to guess: " + sugglet)
         guess = input("Enter your letter to guess: ")  # get user's letter choice
@@ -299,7 +302,7 @@ else:  # help user guess a word
                             del wordslist[i]  # delete the word from the list
                         else:  # the word doesn't contain the incorrect letter
                             i = i + 1  # next word
-
+                    print(" ")
                     print("Incorrect guess #" + str(nummistakes) + ": a " + mistakeset[nummistakes] + " is drawn.")
                     print(drawing[nummistakes])  # notify about incorrect guess & how that impacts the drawing
             if len(wordslist) == 1:  # only one valid word is left
