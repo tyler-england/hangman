@@ -1,4 +1,4 @@
-#Hangman
+# Hangman
 
 Hangman game, two modes of functionality
 
